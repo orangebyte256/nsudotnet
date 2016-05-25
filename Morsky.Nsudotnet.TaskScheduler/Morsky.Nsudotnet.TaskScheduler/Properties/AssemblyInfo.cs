@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Morsky.Nsudotnet.Schedule")]
+[assembly: AssemblyTitle("Morsky.Nsudotnet.TaskScheduler")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Morsky.Nsudotnet.Schedule")]
+[assembly: AssemblyProduct("Morsky.Nsudotnet.TaskScheduler")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5a599b4d-ccb5-4896-b0a1-adfd460cf581")]
+[assembly: Guid("e3a19887-cb4d-4ac3-8f69-42fbbd3e8cd0")]
 
 // Version information for an assembly consists of the following four values:
 //

@@ -1,40 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Morsky.Nsudotnet.Schedule
+namespace Morsky.Nsudotnet.TaskScheduler
 {
-    class MyJob1 : IJob
+    internal class MyJob1 : IJob
     {
         public void Execute(object argument)
         {
-            System.Console.WriteLine("First!");
+            Console.WriteLine("First!");
         }
     }
 
-    class MyJob2 : IJob
+    internal class MyJob2 : IJob
     {
         public void Execute(object argument)
         {
-            System.Console.WriteLine("Second!");
+            Console.WriteLine("Second!");
         }
     }
 
-    class MyJob3 : IJob
+    internal class MyJob3 : IJob
     {
         public void Execute(object argument)
         {
-            System.Console.WriteLine("Third!");
+            Console.WriteLine("Third!");
         }
     }
 
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Schedule scheldure = new Schedule();
+            var scheldure = new Schedule();
             scheldure.ScheduleDelayedJob(new MyJob1(), TimeSpan.FromMilliseconds(2000), null);
             scheldure.SchedulePeriodicJob(new MyJob2(), TimeSpan.FromMilliseconds(3000), null);
             scheldure.SchedulePeriodicJob(new MyJob3(), TimeSpan.FromMilliseconds(1000), null);
