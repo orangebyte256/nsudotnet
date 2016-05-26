@@ -10,32 +10,49 @@ namespace Morsky.Nsudotnet.TaskScheduler
         void Execute(object argument);
     }
 
-    internal class Job
+    internal class Task
     {
-        readonly IJob _job;
-        private TimeSpan _restTime;
-        private readonly bool _isPeriodic;
-        private readonly TimeSpan _origTime;
-        readonly object _arg;
-        public object GetArg()
+        public object Arg
         {
-            return _arg;
+            get
+            {
+                return _arg;
+            }
+            private set
+            {
+                _arg = value;
+            }
         }
-        public IJob GetJob()
+        public IJob Job
         {
-            return _job;
+            get
+            {
+                return _job;
+            }
+            private set
+            {
+                _job = value;
+            }
         }
-        public TimeSpan GetRestTime()
+        public TimeSpan RestTime
         {
-            return _restTime;
+            get
+            {
+                return _restTime;
+            }
+            private set
+            {
+                _restTime = value;
+            }
         }
-        public Job(IJob job, TimeSpan origTime, bool isPeriodic, object arg)
+
+        public Task(IJob job, TimeSpan origTime, bool isPeriodic, object arg)
         {
-            _job = job;
-            _restTime = origTime;
+            Job = job;
+            RestTime = origTime;
+            Arg = arg;
             _isPeriodic = isPeriodic;
             _origTime = origTime;
-            _arg = arg;
         }
         public static void DoJob(object data)
         {
@@ -66,13 +83,18 @@ namespace Morsky.Nsudotnet.TaskScheduler
         {
             _restTime = _origTime;
         }
+
+
+        private object _arg;
+        private IJob _job;
+        private TimeSpan _restTime;
+
+        private bool _isPeriodic;
+        private TimeSpan _origTime;
     }
 
     public class Schedule
     {
-        readonly List<Job> _jobs = new List<Job>();
-        TimeSpan _current = DateTime.Now.TimeOfDay;
-        private readonly System.Timers.Timer _timer = new System.Timers.Timer();
         public Schedule()
         {
             _timer.Enabled = true;
@@ -84,12 +106,12 @@ namespace Morsky.Nsudotnet.TaskScheduler
             TimeSpan newTime = DateTime.Now.TimeOfDay;
             for (int i = 0; i < _jobs.Count(); i++)
             {
-                Job cur = _jobs[i];
+                Task cur = _jobs[i];
                 cur.LeftTime(newTime - _current);
                 if (cur.NeedExecute())
                 {
-                    Thread newThread = new Thread(Job.DoJob);
-                    newThread.Start(new Tuple<IJob, object>(cur.GetJob(), cur.GetArg()));
+                    Thread newThread = new Thread(Task.DoJob);
+                    newThread.Start(new Tuple<IJob, object>(cur.Job, cur.Arg));
                     if (cur.NeedKill())
                     {
                         _jobs.Remove(cur);
@@ -109,14 +131,7 @@ namespace Morsky.Nsudotnet.TaskScheduler
             Update();
             if (_jobs.Any())
             {
-                var min = _jobs[0].GetRestTime();
-                foreach (var cur in _jobs)
-                {
-                    if (min > cur.GetRestTime())
-                    {
-                        min = cur.GetRestTime();
-                    }
-                }
+                var min = _jobs.Min(x => x.RestTime); 
                 _timer.Start();
                 _timer.Interval = min.TotalMilliseconds;
             }
@@ -126,7 +141,7 @@ namespace Morsky.Nsudotnet.TaskScheduler
             }
         }
 
-        private void AddJob(Job job)
+        private void AddJob(Task job)
         {
             _jobs.Add(job);
             ResetTimer(this, null);
@@ -134,19 +149,23 @@ namespace Morsky.Nsudotnet.TaskScheduler
 
         public void ScheduleDelayedJob(IJob job, TimeSpan delay, object arg)
         {
-            var res = new Job(job, delay, false, arg);
+            var res = new Task(job, delay, false, arg);
             AddJob(res);
         }
         public void SchedulePeriodicJob(IJob job, TimeSpan period, object arg)
         {
-            var res = new Job(job, period, true, arg);
+            var res = new Task(job, period, true, arg);
             AddJob(res);
         }
 
         public void SchedulePeriodicJob(IJob job, string cronExpression, object arg)
         {
-            var res = new Job(job, TimeSpan.Parse(cronExpression), true, arg);
+            var res = new Task(job, TimeSpan.Parse(cronExpression), true, arg);
             AddJob(res);
         }
+
+        readonly List<Task> _jobs = new List<Task>();
+        private TimeSpan _current = DateTime.Now.TimeOfDay;
+        private readonly System.Timers.Timer _timer = new System.Timers.Timer();
     }
 }
